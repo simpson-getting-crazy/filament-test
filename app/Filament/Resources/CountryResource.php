@@ -2,16 +2,18 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\CountryResource\Pages;
-use App\Filament\Resources\CountryResource\RelationManagers;
-use App\Models\Country;
 use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Resources\Resource;
 use Filament\Tables;
+use App\Models\Country;
+use Filament\Forms\Form;
 use Filament\Tables\Table;
+use Filament\Infolists\Infolist;
+use Filament\Resources\Resource;
 use Illuminate\Database\Eloquent\Builder;
+use Filament\Infolists\Components\TextEntry;
+use App\Filament\Resources\CountryResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Filament\Resources\CountryResource\RelationManagers;
 
 class CountryResource extends Resource
 {
@@ -66,6 +68,10 @@ class CountryResource extends Resource
                     ->label('Country Phone Code')
                     ->sortable()
                     ->searchable(),
+                Tables\Columns\TextColumn::make('states_count')
+                    ->label('States Count')
+                    ->counts('states')
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -79,12 +85,27 @@ class CountryResource extends Resource
                 //
             ])
             ->actions([
+                Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
+            ]);
+    }
+
+    public static function infolist(Infolist $infolist): Infolist
+    {
+        return $infolist
+            ->schema([
+                \Filament\Infolists\Components\Section::make('Country Information')
+                    ->schema([
+                        TextEntry::make('name')->label('Country Name'),
+                        TextEntry::make('code')->label('Country Code'),
+                        TextEntry::make('phonecode')->label('Country Phone Code'),
+                    ])
+                    ->columns(3),
             ]);
     }
 

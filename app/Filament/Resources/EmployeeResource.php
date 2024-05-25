@@ -9,12 +9,14 @@ use Filament\Forms\Set;
 use App\Models\Employee;
 use Filament\Forms\Form;
 use Filament\Tables\Table;
+use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
+use Filament\Tables\Columns\TextColumn;
 use Illuminate\Database\Eloquent\Builder;
+use Filament\Infolists\Components\TextEntry;
 use App\Filament\Resources\EmployeeResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\EmployeeResource\RelationManagers;
-use Filament\Tables\Columns\TextColumn;
 
 class EmployeeResource extends Resource
 {
@@ -170,6 +172,40 @@ class EmployeeResource extends Resource
             ]);
     }
 
+    public static function infolist(Infolist $infolist): Infolist
+    {
+        return $infolist
+            ->schema([
+                \Filament\Infolists\Components\Section::make('User Location Information')
+                    ->schema([
+                        TextEntry::make('country.name')->label('Country Name'),
+                        TextEntry::make('state.name')->label('State Name'),
+                        TextEntry::make('city.name')->label('City Name'),
+                        TextEntry::make('department.name')->label('Department Name'),
+                    ])
+                    ->columns(2),
+                \Filament\Infolists\Components\Section::make('User Name Information')
+                    ->schema([
+                        TextEntry::make('first_name')->label('First Name'),
+                        TextEntry::make('last_name')->label('Last Name'),
+                        TextEntry::make('middle_name')->label('Middle Name'),
+                    ])
+                    ->columns(3),
+                \Filament\Infolists\Components\Section::make('User Address Information')
+                    ->schema([
+                        TextEntry::make('address')->label('Address'),
+                        TextEntry::make('zip_code')->label('Zip Code'),
+                    ])
+                    ->columns(2),
+                \Filament\Infolists\Components\Section::make('User Date Information')
+                    ->schema([
+                        TextEntry::make('date_of_birth')->label('Date of Birth'),
+                        TextEntry::make('date_hired')->label('Date Hired'),
+                    ])
+                    ->columns(2),
+            ]);
+    }
+
     public static function getRelations(): array
     {
         return [
@@ -182,7 +218,7 @@ class EmployeeResource extends Resource
         return [
             'index' => Pages\ListEmployees::route('/'),
             'create' => Pages\CreateEmployee::route('/create'),
-            'view' => Pages\ViewEmployee::route('/{record}'),
+            // 'view' => Pages\ViewEmployee::route('/{record}'),
             'edit' => Pages\EditEmployee::route('/{record}/edit'),
         ];
     }

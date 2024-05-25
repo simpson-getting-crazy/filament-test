@@ -2,16 +2,19 @@
 
 namespace App\Filament\Resources;
 
+use Filament\Forms;
+use Filament\Tables;
+use Filament\Forms\Form;
+use App\Models\Department;
+use Filament\Tables\Table;
+use Filament\Infolists\Infolist;
+use Filament\Resources\Resource;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
+use Filament\Infolists\Components\TextEntry;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\DepartmentResource\Pages;
 use App\Filament\Resources\DepartmentResource\RelationManagers;
-use App\Models\Department;
-use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Resources\Resource;
-use Filament\Tables;
-use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class DepartmentResource extends Resource
 {
@@ -75,6 +78,23 @@ class DepartmentResource extends Resource
             ]);
     }
 
+    public static function infolist(Infolist $infolist): Infolist
+    {
+        return $infolist
+            ->schema([
+                \Filament\Infolists\Components\Section::make('Department Information')
+                    ->schema([
+                        TextEntry::make('name')->label('Department Name'),
+                        TextEntry::make('employees_count')
+                            ->label('Employees Count')
+                            ->state(function (Model $record): int {
+                                return $record->employees()->count();
+                            }),
+                    ])
+                    ->columns(2)
+            ]);
+    }
+
     public static function getRelations(): array
     {
         return [
@@ -87,7 +107,7 @@ class DepartmentResource extends Resource
         return [
             'index' => Pages\ListDepartments::route('/'),
             'create' => Pages\CreateDepartment::route('/create'),
-            'view' => Pages\ViewDepartment::route('/{record}'),
+            // 'view' => Pages\ViewDepartment::route('/{record}'),
             'edit' => Pages\EditDepartment::route('/{record}/edit'),
         ];
     }
