@@ -23,9 +23,19 @@ class UserResource extends Resource
 
     protected static ?string $modelLabel = 'Users';
 
-    protected static ?string $navigationGroup = 'User Information';
+    protected static ?string $navigationGroup = 'User Management';
 
     protected static ?int $navigationSort = 1;
+
+    public static function getNavigationBadge(): ?string
+    {
+        return static::getModel()::count();
+    }
+
+    public static function getNavigationBadgeColor(): string|array|null
+    {
+        return static::getModel()::count() > 0 ? 'success' : 'warning';
+    }
 
     public static function form(Form $form): Form
     {

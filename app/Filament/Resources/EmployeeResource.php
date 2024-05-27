@@ -12,11 +12,13 @@ use Filament\Tables\Table;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Filament\Tables\Columns\TextColumn;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Filament\Infolists\Components\TextEntry;
 use App\Filament\Resources\EmployeeResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\EmployeeResource\RelationManagers;
+use Filament\Notifications\Notification;
 
 class EmployeeResource extends Resource
 {
@@ -28,9 +30,41 @@ class EmployeeResource extends Resource
 
     protected static ?string $modelLabel = 'Employee';
 
-    protected static ?string $navigationGroup = 'User Information';
+    protected static ?string $navigationGroup = 'Employee Management';
 
-    protected static ?int $navigationSort = 2;
+    protected static ?int $navigationSort = 1;
+
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['first_name', 'middle_name', 'last_name'];
+    }
+
+    public static function getGlobalSearchResultTitle(Model $record): string
+    {
+        return "{$record->first_name} {$record->last_name}";
+    }
+
+    public static function getGlobalSearchResultDetails(Model $record): array
+    {
+        return [
+            'Country' => $record->country->name,
+        ];
+    }
+
+    public static function getGlobalSearchEloquentQuery(): Builder
+    {
+        return parent::getGlobalSearchEloquentQuery()->with(['country']);
+    }
+
+    public static function getNavigationBadge(): ?string
+    {
+        return static::getModel()::count();
+    }
+
+    public static function getNavigationBadgeColor(): string|array|null
+    {
+        return static::getModel()::count() > 0 ? 'success' : 'warning';
+    }
 
     public static function form(Form $form): Form
     {
@@ -186,8 +220,8 @@ class EmployeeResource extends Resource
                     ->indicateUsing(function (array $data): array {
                         $indicators = array();
                         if ($data['created_from'] ?? null) {
-                            $indicators['created_from'] = 'Created from '.\Carbon\Carbon::parse($data['created_from'])->toFormattedDate();
-                            $indicators['created_until'] = 'Created until '.\Carbon\Carbon::parse($date['created_until'])->toFormattedDate();
+                            $indicators['created_from'] = 'Created from '.\Carbon\Carbon::parse($data['created_from'])->toFormattedDateString();
+                            $indicators['created_until'] = 'Created until '.\Carbon\Carbon::parse($data['created_until'])->toFormattedDateString();
                         }
 
                         return $indicators;
@@ -196,6 +230,13 @@ class EmployeeResource extends Resource
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make()
+                    ->successNotification(
+                        Notification::make()
+                            ->success()
+                            ->title(__('actions.deleted.title', ['prop' => 'Employee']))
+                            ->body(__('actions.deleted.body', ['prop' => 'Employee']))
+                    ),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
