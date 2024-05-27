@@ -1,35 +1,20 @@
 <?php
 
-namespace App\Filament\Resources;
+namespace App\Filament\Resources\CountryResource\RelationManagers;
 
 use Filament\Forms;
-use Filament\Tables;
-use App\Models\State;
 use Filament\Forms\Form;
+use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Tables;
 use Filament\Tables\Table;
-use Filament\Infolists\Infolist;
-use Filament\Resources\Resource;
 use Illuminate\Database\Eloquent\Builder;
-use Filament\Infolists\Components\TextEntry;
-use App\Filament\Resources\StateResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use App\Filament\Resources\StateResource\RelationManagers;
 
-class StateResource extends Resource
+class StatesRelationManager extends RelationManager
 {
-    protected static ?string $model = State::class;
+    protected static string $relationship = 'states';
 
-    protected static ?string $navigationIcon = 'heroicon-o-map';
-
-    protected static ?string $navigationLabel = 'States';
-
-    protected static ?string $modelLabel = 'States';
-
-    protected static ?string $navigationGroup = 'System Management';
-
-    protected static ?int $navigationSort = 2;
-
-    public static function form(Form $form): Form
+    public function form(Form $form): Form
     {
         return $form
             ->schema([
@@ -48,9 +33,10 @@ class StateResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table
+    public function table(Table $table): Table
     {
         return $table
+            ->recordTitleAttribute('name')
             ->columns([
                 Tables\Columns\TextColumn::make('country.name')
                     ->label('Country Name')
@@ -74,44 +60,18 @@ class StateResource extends Resource
             ->filters([
                 //
             ])
+            ->headerActions([
+                Tables\Actions\CreateAction::make(),
+            ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ]);
-    }
-
-    public static function infolist(Infolist $infolist): Infolist
-    {
-        return $infolist
-            ->schema([
-                \Filament\Infolists\Components\Section::make('State Information')
-                    ->schema([
-                        TextEntry::make('country.name')->label('Country Name'),
-                        TextEntry::make('name')->label('State Name'),
-                    ])
-                    ->columns(2)
-            ]);
-    }
-
-    public static function getRelations(): array
-    {
-        return [
-            \App\Filament\Resources\StateResource\RelationManagers\CitiesRelationManager::class,
-            \App\Filament\Resources\StateResource\RelationManagers\EmployeesRelationManager::class,
-        ];
-    }
-
-    public static function getPages(): array
-    {
-        return [
-            'index' => Pages\ListStates::route('/'),
-            'create' => Pages\CreateState::route('/create'),
-            'edit' => Pages\EditState::route('/{record}/edit'),
-        ];
     }
 }

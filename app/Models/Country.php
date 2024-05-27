@@ -22,4 +22,9 @@ class Country extends Model
     {
         return $this->hasMany(State::class);
     }
+
+    public function employees(): HasMany
+    {
+        return $this->hasMany(Employee::class);
+    }
 }

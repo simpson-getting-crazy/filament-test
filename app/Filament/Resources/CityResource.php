@@ -100,7 +100,7 @@ class CityResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            \App\Filament\Resources\CityResource\RelationManagers\EmployeesRelationManager::class,
         ];
     }
 
