@@ -19,8 +19,5 @@ class DatabaseSeeder extends Seeder
             StateSeeder::class,
             CitySeeder::class,
         ]);
-
-        Department::query()->delete();
-        Department::create(['name' => 'Laravel']);
     }
 }
