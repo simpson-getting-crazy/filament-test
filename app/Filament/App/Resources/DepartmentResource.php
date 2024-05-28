@@ -34,9 +34,6 @@ class DepartmentResource extends Resource
                 Forms\Components\Section::make('Department Information')
                     ->description('please fill these forms correctly')
                     ->schema([
-                        Forms\Components\TextInput::make('team_id')
-                            ->visible(false)
-                            ->default(Filament::getTenant()->id),
                         Forms\Components\TextInput::make('name')
                             ->label('Name')
                             ->required()
